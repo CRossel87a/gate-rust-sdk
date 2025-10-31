@@ -14,7 +14,7 @@ fn unlock_keys() -> anyhow::Result<(String, String)>{
 #[tokio::test]
 async fn test_futures_info() -> Result<()>{
     let sdk = GateSDK::new_readonly();
-    let cis = sdk.future_contracts("usdt").await?;
+    let cis = sdk.futures_contracts("usdt").await?;
     let json = serde_json::to_string_pretty(&cis)?;
     std::fs::write("temp/futures_info.json", &json)?;
 
@@ -36,7 +36,16 @@ async fn test_futures_info() -> Result<()>{
 async fn test_futures_account() -> Result<()>{
     let (key, secret) = unlock_keys()?;
     let sdk = GateSDK::new(key, secret);
-    let account = sdk.future_account("usdt").await?;
+    let account = sdk.futures_account("usdt").await?;
     dbg!(account);
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_futures_positions() -> Result<()>{
+    let (key, secret) = unlock_keys()?;
+    let sdk = GateSDK::new(key, secret);
+    let positions = sdk.futures_positions("usdt").await?;
+    dbg!(positions);
     Ok(())
 }
