@@ -3,6 +3,14 @@ use std::collections::HashMap;
 use gate_rust_sdk::GateSDK;
 use anyhow::{Result, ensure};
 
+use std::env;
+
+fn unlock_keys() -> anyhow::Result<(String, String)>{
+    let key: String = env::var("gate_key")?;
+    let secret: String = env::var("gate_secret")?;
+    Ok((key, secret))
+}
+
 #[tokio::test]
 async fn test_futures_info() -> Result<()>{
     let sdk = GateSDK::new_readonly();
@@ -21,5 +29,14 @@ async fn test_futures_info() -> Result<()>{
     let json = serde_json::to_string_pretty(&funding_rates)?;
     std::fs::write("temp/futures_funding_rates.json", &json)?;
 
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_futures_account() -> Result<()>{
+    let (key, secret) = unlock_keys()?;
+    let sdk = GateSDK::new(key, secret);
+    let account = sdk.future_account("usdt").await?;
+    dbg!(account);
     Ok(())
 }

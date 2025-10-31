@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 
+
 use crate::*;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -13,6 +14,13 @@ pub struct ContractInfo {
     pub funding_interval: u64,
     pub funding_impact_value: String,
     pub funding_rate: String,
+}
+
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct FuturesAccount {
+    pub currency: String,
+    pub total: String
 }
 
 impl ContractInfo {
@@ -35,6 +43,25 @@ impl GateSDK {
         let text = resp.text().await?;
 
         serde_json::from_str::<Vec<ContractInfo>>(&text)
+            .map_err(|err| {
+                anyhow!("Err: {} text: {}", err, text)
+            })
+    }
+
+    /// https://www.gate.com/docs/developers/apiv4/en/#get-futures-account
+    pub async fn future_account(&self, settle_coin: &str) -> Result<FuturesAccount> {
+        let endpoint = format!("/futures/{}/accounts", settle_coin.to_lowercase());
+        
+        let resp = self.get_request(&endpoint).await?;
+        let status = resp.status();
+        let text = resp.text().await?;
+        
+        if !status.is_success() {
+            eprintln!("Response body: {}", text);
+            return Err(anyhow!("HTTP status {} for url", status));
+        }
+        
+        serde_json::from_str::<FuturesAccount>(&text)
             .map_err(|err| {
                 anyhow!("Err: {} text: {}", err, text)
             })
