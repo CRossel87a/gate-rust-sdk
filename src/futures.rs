@@ -14,6 +14,7 @@ pub struct FuturesContractInfo {
     pub funding_interval: u64,
     pub funding_impact_value: String,
     pub funding_rate: String,
+    pub quanto_multiplier: String
 }
 
 
