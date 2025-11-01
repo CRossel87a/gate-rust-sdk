@@ -21,7 +21,9 @@ pub struct FuturesContractInfo {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FuturesAccount {
     pub currency: String,
-    pub total: String
+    pub total: String,
+    pub unrealised_pnl: String,
+    pub cross_margin_balance: String
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -67,7 +69,7 @@ impl GateSDK {
         let resp = self.get_request(&endpoint).await?;
         let status = resp.status();
         let text = resp.text().await?;
-        
+
         if !status.is_success() {
             eprintln!("Response body: {}", text);
             return Err(anyhow!("HTTP status {} for url", status));
